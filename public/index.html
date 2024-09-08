@@ -7,17 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen">
-<div class="w-full flex flex-col items-center justify-center m-4 font-mono text-indigo-800 h-full">
+<div class="w-full flex flex-col items-center justify-center m-4 font-mono text-indigo-800 
+    md:h-full min-w-72 scroll-auto">
     <header class="text-3xl font-bold"> Finance Logger</header>
     <hr class="w-full h-0.5 m-3">
     <div class="p-6 h-auto bg-indigo-50 w-full flex flex-col items-center justify-center">
-        <form id="services" name="services">
+        <div>
+            <ul id="records" class="p-3 list-none mb-6">
+
+            </ul>
+            <form id="services" name="services">
             <div class="flex flex-col md:flex-row items-center justify-center">
                 <div class="flex flex-col items-center p-2 ">
                     <label for="type" class="m-1">Type: </label>
                     <select name="type" id="type" class="p-1 rounded-s">
                         <option class="m-1" value="Invoice">Invoice</option>
-                        <option class="m-1" value="saab">Saab</option>
+                        <option class="m-1" value="Payment">Payment</option>
                     </select>
                 </div>
                 <div class="flex flex-col items-center p-2">
@@ -40,6 +45,7 @@
                 </div>
             </div>
         </form>
+        </div>
         <div class="mt-3">
             <a href="https://www.linkedin.com/in/kolapoabolarinwa/" class="">&copy; Lyseis </a>
         </div>
