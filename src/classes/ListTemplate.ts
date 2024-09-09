@@ -1,5 +1,5 @@
 import {ListModel, Positions} from "../models";
-import {HasFormatter} from "../interfaces";
+import {HasFormatter} from "../interfaces_types";
 
 export class ListTemplate {
     constructor(private ulElement: HTMLUListElement) {

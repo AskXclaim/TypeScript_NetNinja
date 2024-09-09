@@ -1,4 +1,4 @@
-import {HasFormatter} from "../interfaces";
+import {HasFormatter} from "../interfaces_types";
 import {JobDetail} from "../models";
 
 export class Payment implements HasFormatter {

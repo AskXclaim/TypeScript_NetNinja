@@ -1,14 +1,15 @@
 "use strict";
-import {HasFormatter} from "./interfaces";
+import {FormValues, HasFormatter} from "./interfaces_types";
 import {FinanceTypes, HtmlElements, Positions} from "./models";
-import {Invoice, ListTemplate, Payment} from "./classes";
+import {FinancialDocValidator, Invoice, ListTemplate, Payment} from "./classes";
 
-
-type FormValues = {
-    typeValue: string,
-    toFromValue: string,
-    detailsValue: string,
-    amountValue: number
+type ErroredItem = {
+    name: string,
+    isValid: boolean
+};
+type formValidation = {
+    isValid: boolean,
+    elementsName: string[]
 }
 const getUiElement = (elementName: string): HTMLUListElement =>
     document.querySelector(`#${elementName}`) as HTMLUListElement;
@@ -29,6 +30,47 @@ const getFormValue = (): FormValues => {
     const amountValue = parseFloat(getElementValue("amount", HtmlElements.Input) ?? "");
     return {
         typeValue, toFromValue, detailsValue, amountValue
+    }
+}
+
+const setFormErrors = (erroredItems: ErroredItem[]): string[] => {
+    const invalidElements: string[] = [];
+    for (const item of erroredItems) {
+        let element: HTMLInputElement = document.getElementById
+        (`${item.name.replace("Value", "")}`) as HTMLInputElement;
+        invalidElements.push(element.id);
+        console.log(element);
+        element.style.borderWidth = "thin";
+        element.style.borderColor = "red";
+    }
+    return invalidElements;
+}
+
+const areEntriesValid = (formValues: FormValues): formValidation => {
+    let erroredItems: ErroredItem[] = [];
+
+    for (const key in formValues) {
+        if (!FinancialDocValidator.validate(formValues[key as keyof FormValues])) {
+            erroredItems.push({name: key, isValid: false});
+        }
+    }
+    let elementsName: string[] = [];
+    if (erroredItems.length > 0) {
+        console.log(erroredItems);
+        elementsName = setFormErrors(erroredItems);
+        return {isValid: false, elementsName};
+    }
+    return {isValid: true, elementsName};
+}
+
+const addEventToInputs = (validation:formValidation) => {
+    for (const elementName of validation.elementsName) {
+        let element = document.getElementById(`${elementName}`) as HTMLInputElement;
+        element.addEventListener("focus", (event: Event) => {
+            event.preventDefault();
+            element.style.borderColor = "none";
+            element.style.borderWidth = "0";
+        });
     }
 }
 const getFinancialType = (formValues: FormValues) => {
@@ -52,10 +94,17 @@ let servicesForm = document.querySelector("#services");
 if (servicesForm) {
     servicesForm = servicesForm as HTMLFormElement;
     uiElement = getUiElement("records");
+
     servicesForm.addEventListener("submit", (event:Event) => {
         event.preventDefault();
         const formValues = getFormValue();
         console.log(formValues);
+        const validation = areEntriesValid(formValues);
+        if (!validation.isValid) {
+            addEventToInputs(validation);
+            return;
+        }
+        
         const listTemplate = new ListTemplate(uiElement);
         let financialType = getFinancialType(formValues);
         console.log(financialType);

@@ -1,6 +1,6 @@
 "use strict";
 import { FinanceTypes, HtmlElements, Positions } from "./models";
-import { Invoice, ListTemplate, Payment } from "./classes";
+import { FinancialDocValidator, Invoice, ListTemplate, Payment } from "./classes";
 const getUiElement = (elementName) => document.querySelector(`#${elementName}`);
 const getElementValue = (elementName, elementType) => {
     if (elementType === HtmlElements.Select)
@@ -18,6 +18,42 @@ const getFormValue = () => {
     return {
         typeValue, toFromValue, detailsValue, amountValue
     };
+};
+const setFormErrors = (erroredItems) => {
+    const invalidElements = [];
+    for (const item of erroredItems) {
+        let element = document.getElementById(`${item.name.replace("Value", "")}`);
+        invalidElements.push(element.id);
+        console.log(element);
+        element.style.borderWidth = "thin";
+        element.style.borderColor = "red";
+    }
+    return invalidElements;
+};
+const areEntriesValid = (formValues) => {
+    let erroredItems = [];
+    for (const key in formValues) {
+        if (!FinancialDocValidator.validate(formValues[key])) {
+            erroredItems.push({ name: key, isValid: false });
+        }
+    }
+    let elementsName = [];
+    if (erroredItems.length > 0) {
+        console.log(erroredItems);
+        elementsName = setFormErrors(erroredItems);
+        return { isValid: false, elementsName };
+    }
+    return { isValid: true, elementsName };
+};
+const addEventToInputs = (validation) => {
+    for (const elementName of validation.elementsName) {
+        let element = document.getElementById(`${elementName}`);
+        element.addEventListener("focus", (event) => {
+            event.preventDefault();
+            element.style.borderColor = "none";
+            element.style.borderWidth = "0";
+        });
+    }
 };
 const getFinancialType = (formValues) => {
     let financialType;
@@ -40,6 +76,11 @@ if (servicesForm) {
         event.preventDefault();
         const formValues = getFormValue();
         console.log(formValues);
+        const validation = areEntriesValid(formValues);
+        if (!validation.isValid) {
+            addEventToInputs(validation);
+            return;
+        }
         const listTemplate = new ListTemplate(uiElement);
         let financialType = getFinancialType(formValues);
         console.log(financialType);

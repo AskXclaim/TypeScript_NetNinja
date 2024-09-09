@@ -1,4 +1,4 @@
-import {HasFormatter} from "../interfaces";
+import {HasFormatter} from "../interfaces_types";
 
 export class Invoice implements HasFormatter {
 
